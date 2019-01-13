@@ -3,28 +3,43 @@ package com.jp.authservice.entities;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.lang.NonNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class User {
 
 	@Id
 	private String id;
+
+	@NonNull
 	private String name;
+	@NonNull
 	private String email;
-//		match: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
+	// match: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
+
+	@Transient
+	private String password;
+
+	@JsonIgnore
 	private String salt;
+	@JsonIgnore
 	private String hash;
+
 	private Date created;
 	private String status;
 
 	public User() {
 	}
-	
+
 	public User(String name, String email) {
 		setName(name);
 		setEmail(email);
 	}
 
-	// { type: String, enum: ['active', 'suspended', 'inactive'], default: 'active',
+	// { type: String, enum: ['active', 'suspended', 'inactive'], default:
+	// 'active',
 	// required: true }
 	public String getId() {
 		return id;
@@ -67,6 +82,9 @@ public class User {
 	}
 
 	public Date getCreated() {
+		if (created == null) {
+			created = new Date();
+		}
 		return created;
 	}
 
@@ -75,6 +93,9 @@ public class User {
 	}
 
 	public String getStatus() {
+		if (status == null) {
+			status = "active";
+		}
 		return status;
 	}
 
@@ -135,6 +156,14 @@ public class User {
 	public String toString() {
 		return "User [id=" + id + ", name=" + name + ", email=" + email + ", created=" + created + ", status=" + status
 				+ "]";
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 }
