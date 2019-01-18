@@ -7,7 +7,9 @@ It already carries a mongoDB image in the docker-compose.yml file. (Docker must 
 
 1) Set you hashing secret key in the `application.properties` file (to be changed in the future).
 
-2.1)
+2.1) By default, the embedded server start on port 8080. But we can provide a different value in an application.properties file:
+server.port=8081
+
 #####  If you are using Maven, you can run the application using  
  ` $ sudo docker-compose up & ./mvnw spring-boot:run ` 
  
@@ -22,6 +24,6 @@ Then you can run the JAR file:
 
 
 
-#### Swagger    
+## Swagger    
 
 Swagger documentation is available at : `http://localhost:8080/swagger-ui.html`
