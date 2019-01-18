@@ -6,7 +6,10 @@ import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.util.Date;
 
+import javax.security.sasl.AuthenticationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.jp.authservice.entities.User;
@@ -17,6 +20,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Service
 public class AuthService {
 
+	@Value(value = "${jwt.expiration.minutes}")
 	private Long minutes;
 
 	@Autowired
@@ -26,18 +30,20 @@ public class AuthService {
 	private UserService userService;
 
 	public AuthService() {
-		this.minutes = 5L;
+		if (minutes == null)
+			this.minutes = 5L;
 	}
 
-	public String login(User u) {
+	public String login(User u) throws AuthenticationException {
 		User user = userService.findByEmail(u.getEmail());
 		try {
 			if (user != null) {
 				u.setSalt(user.getSalt());
 				userService.applyHashAndSalt(u);
-				// TODO RETURN ERROR IF WRONG PASSWORD
 				if (u.getHash().equals(user.getHash())) {
 					return getToken(user);
+				} else {
+					throw new AuthenticationException("Email or password are incorrect.");
 				}
 			}
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {

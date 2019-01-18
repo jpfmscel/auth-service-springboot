@@ -37,8 +37,16 @@ public class UserService {
 		throw new RestResponseException("User does not exist!");
 	}
 
-	public User save(User u) {
+	public User update(User u) throws RestResponseException {
+		return repository.save(u);
+	}
+
+	public User insert(User u) throws RestResponseException {
 		try {
+			User findByEmail = findByEmail(u.getEmail());
+			if (findByEmail != null) {
+				throw new RestResponseException("This e-mail is already registered!");
+			}
 			applyHashAndSalt(u);
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			e.printStackTrace();
@@ -72,7 +80,9 @@ public class UserService {
 		return repository.findAll();
 	}
 
-	public void delete(String id) {
-		repository.deleteById(id);
+	public void delete(String id) throws RestResponseException {
+		User user = findById(id);
+		if (user != null)
+			repository.deleteById(id);
 	}
 }

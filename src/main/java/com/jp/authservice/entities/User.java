@@ -2,6 +2,10 @@ package com.jp.authservice.entities;
 
 import java.util.Date;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PastOrPresent;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.lang.NonNull;
@@ -15,7 +19,9 @@ public class User {
 
 	@NonNull
 	private String name;
-	@NonNull
+
+	@NotBlank
+	@Email
 	private String email;
 	// match: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
 
@@ -27,7 +33,9 @@ public class User {
 	@JsonIgnore
 	private String hash;
 
+	@PastOrPresent
 	private Date created;
+	@NotBlank
 	private String status;
 
 	public User() {

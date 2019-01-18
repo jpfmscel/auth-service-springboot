@@ -1,5 +1,7 @@
 package com.jp.authservice.controllers;
 
+import javax.security.sasl.AuthenticationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +23,14 @@ public class AuthController {
 	@SuppressWarnings({ "rawtypes", "unchecked", "static-access" })
 	@PostMapping(path = "/login")
 	public ResponseEntity login(@RequestBody User user) {
-		String token = service.login(user);
-		if (token != null) {
-			return new ResponseEntity(HttpStatus.ACCEPTED).ok(token);
+		String token;
+		try {
+			token = service.login(user);
+			if (token != null) {
+				return new ResponseEntity(HttpStatus.ACCEPTED).ok(token);
+			}
+		} catch (AuthenticationException e) {
+			return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity("User not found.", HttpStatus.BAD_REQUEST);
 	}

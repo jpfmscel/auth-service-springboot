@@ -1,5 +1,7 @@
 package com.jp.authservice.interceptors;
 
+import java.util.Arrays;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -7,8 +9,10 @@ import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import com.jp.authservice.annotations.Secured;
 import com.jp.authservice.services.AuthService;
 
 @Configuration
@@ -23,8 +27,10 @@ public class AuthInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 
-		if (!shouldVerifyToken(request)) {
-			return true;
+		if (handler instanceof HandlerMethod) {
+			if (!shouldVerifyToken((HandlerMethod) handler)) {
+				return true;
+			}
 		}
 
 		String authorization = request.getHeader("Authorization");
@@ -50,8 +56,9 @@ public class AuthInterceptor implements HandlerInterceptor {
 		return false;
 	}
 
-	private boolean shouldVerifyToken(HttpServletRequest request) {
-		return !"/api/auth/login".equals(request.getServletPath());
+	private boolean shouldVerifyToken(HandlerMethod handler) {
+		return Arrays.asList(handler.getMethod().getAnnotations()).parallelStream()
+				.anyMatch(an -> an.annotationType().equals(Secured.class));
 	}
 
 }
